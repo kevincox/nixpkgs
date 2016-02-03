@@ -37,7 +37,8 @@ in stdenv.mkDerivation rec {
   ];
 
   preConfigure = ''
-    export MAVEN_OPTS="-Dmaven.repo.local=${mavenRepo}"
+    mkdir src/java/.mvn
+    echo "-Dmaven.repo.local=${mavenRepo}" > src/java/.mvn/maven.config
 
     substituteInPlace src/launcher/fetcher.cpp \
       --replace '"gzip' '"${gzip}/bin/gzip'    \
@@ -141,7 +142,7 @@ in stdenv.mkDerivation rec {
     homepage    = "http://mesos.apache.org";
     license     = licenses.asl20;
     description = "A cluster manager that provides efficient resource isolation and sharing across distributed applications, or frameworks";
-    maintainers = with maintainers; [ cstrahan offline rushmorem ];
+    maintainers = with maintainers; [ cstrahan offline rushmorem kamilchm ];
     platforms   = platforms.linux;
   };
 }
