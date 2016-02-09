@@ -113,6 +113,14 @@ in stdenv.mkDerivation rec {
       --prefix="$out"
     rm -f "$out/lib/${python.libPrefix}"/site-packages/site.py*
     popd
+
+    # optional python dependency for mesos cli 
+    pushd src/python/cli
+    ${python}/bin/${python.executable} setup.py install \
+      --install-lib=$out/lib/${python.libPrefix}/site-packages \
+      --old-and-unmanageable \
+      --prefix="$out"
+    popd
   '';
 
   postFixup = ''
