@@ -107,7 +107,7 @@ in stdenv.mkDerivation rec {
     pushd src/python
     mkdir -p $out/lib/${python.libPrefix}/site-packages
     export PYTHONPATH="$out/lib/${python.libPrefix}/site-packages:$PYTHONPATH"
-    ${python}/bin/${python.executable} setup.py install \
+    ${python}/bin/${python.executable} setup.py --quiet install \
       --install-lib=$out/lib/${python.libPrefix}/site-packages \
       --old-and-unmanageable \
       --prefix="$out"
@@ -116,7 +116,7 @@ in stdenv.mkDerivation rec {
 
     # optional python dependency for mesos cli 
     pushd src/python/cli
-    ${python}/bin/${python.executable} setup.py install \
+    ${python}/bin/${python.executable} setup.py --quiet install \
       --install-lib=$out/lib/${python.libPrefix}/site-packages \
       --old-and-unmanageable \
       --prefix="$out"
