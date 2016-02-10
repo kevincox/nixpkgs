@@ -141,7 +141,7 @@ in stdenv.mkDerivation rec {
     # wrap the python programs
     for prog in mesos-cat mesos-ps mesos-scp mesos-tail; do
       wrapProgram "$out/bin/$prog" \
-        --prefix PYTHONPATH ":" "$out/libexec/mesos/python"
+        --prefix PYTHONPATH ":" "$out/lib/${python.libPrefix}/site-packages"
       true
     done
   '';
