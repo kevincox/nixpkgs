@@ -14,27 +14,31 @@ infoFile: let
   info = lib.importJSON infoFile;
 
   script = writeText "build-maven-repository.sh" ''
-    ${lib.concatStrings (map (dep: let
+    ${lib.concatStrings (map (dep: if ! dep ? url then "" else let
       inherit (dep)
-        url sha1 groupId artifactId version
+        url sha1 groupId artifactId version classifier
         authenticated metadata extension repository-id;
 
       versionDir = dep.unresolved-version or version;
 
+      classifierSlug = if classifier == "" then "" else "-" + classifier;
+
       fetch = (if authenticated then requireFile else fetchurl) {
         inherit url sha1;
+        name = "${artifactId}-${version}${classifierSlug}.${extension}";
       };
 
       fetchMetadata = (if authenticated then requireFile else fetchurl) {
         inherit (metadata) url sha1;
       };
     in ''
-      dir=$out/$(echo ${groupId} | sed 's|\.|/|g')/${artifactId}/${versionDir}
-      mkdir -p $dir
-      ln -sv ${fetch} $dir/${fetch.name}
+      basedir="$out/$(echo ${groupId} | sed 's|\.|/|g')/${artifactId}"
+      dir="$basedir/${versionDir}"
+      mkdir -p "$dir"
+      ln -sv "${fetch}" "$dir/${fetch.name}"
       ${lib.optionalString (dep ? metadata) ''
-        ln -svf ${fetchMetadata} $dir/maven-metadata-${repository-id}.xml
-        ln -sv ${fetch} $dir/$(echo ${fetch.name} | sed 's|${version}|${dep.unresolved-version}|')
+        ln -svf '${fetchMetadata}' "$basedir/maven-metadata-${repository-id}.xml"
+        ln -sv '${fetch}' "$dir/$(echo '${fetch.name}' | sed 's|${version}|${dep.unresolved-version}|')"
       ''}
     '') info.dependencies)}
   '';
